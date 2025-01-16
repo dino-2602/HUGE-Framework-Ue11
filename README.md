@@ -1,98 +1,92 @@
 # reCAPTCHA Integration in Huge Framework
 
-## Beschreibung
-Dieses Projekt integriert Google reCAPTCHA V2 in das Huge Framework, um sicherzustellen, dass nur echte Benutzer auf das Formular zugreifen können. Die Implementierung umfasst Frontend- und Backend-Komponenten, um die Benutzerregistrierung abzusichern.
+## Übersicht
+Dieses Projekt erweitert das Huge Framework, indem es Google reCAPTCHA V2 integriert. Dadurch wird die Sicherheit der Benutzerregistrierung erhöht und Bots werden effektiv blockiert. Das Projekt umfasst sowohl die Frontend- als auch die Backend-Integration von reCAPTCHA.
 
 ---
 
-## Voraussetzungen
-- **Google reCAPTCHA Konto**: Registriere eine neue Site in der [Google reCAPTCHA Admin-Konsole](https://www.google.com/recaptcha/admin).
-- **Site Key** und **Secret Key**: Diese werden bei der Registrierung in der Konsole bereitgestellt.
+## Ziel
+Das Ziel ist es, sicherzustellen, dass nur echte Benutzer sich registrieren können. Diese Funktionalität wurde speziell für den Admin-Bereich implementiert.
 
 ---
 
-## Implementierungsschritte
+## Anforderungen
+- **Google reCAPTCHA Konto:** Melde dich bei der [Google reCAPTCHA Admin-Konsole](https://www.google.com/recaptcha/admin) an.
+- **Site Key und Secret Key:** Diese erhältst du nach der Registrierung deiner Website.
+
+---
+
+## Installation
 
 ### 1. Frontend-Integration
-1. **reCAPTCHA Script einbinden**:
-   Füge in der Datei `views/register/index.php` das folgende Skript hinzu:
+1. **Script einfügen:**
+   Binde das reCAPTCHA-Skript in der Datei `views/register/index.php` ein:
    ```html
    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
    ```
 
-2. **reCAPTCHA-Widget hinzufügen**:
-   Platziere das Widget im Formular, vorzugsweise vor dem Submit-Button:
+2. **Widget hinzufügen:**
+   Ergänze das Widget innerhalb des Formulars:
+   ```html
+   <div class="g-recaptcha" data-sitekey="YOUR_SITE_KEY"></div>
+   ```
+   Ersetze `YOUR_SITE_KEY` durch deinen Google Site Key.
+
+3. **Formular aktualisieren:**
+   Stelle sicher, dass das Formular so aussieht:
    ```html
    <form action="/register/register_action" method="post">
-       <!-- Andere Formularfelder -->
+       <!-- Andere Felder -->
        <div class="g-recaptcha" data-sitekey="YOUR_SITE_KEY"></div>
        <button type="submit">Benutzer registrieren</button>
    </form>
    ```
-   Ersetze `YOUR_SITE_KEY` durch den Google reCAPTCHA Site Key.
 
 ### 2. Backend-Integration
-1. **Controller anpassen**:
-   Öffne die Datei `controllers/RegisterController.php` und füge die reCAPTCHA-Validierung in der Methode `register_action` hinzu:
+1. **Controller anpassen:**
+   Bearbeite die Methode `register_action` in `controllers/RegisterController.php`:
    ```php
-   public function register_action(): void
-   {
-       // reCAPTCHA-Validierung
-       $recaptchaResponse = $_POST['g-recaptcha-response'] ?? '';
+   $recaptchaResponse = Request::post('g-recaptcha-response');
+   $recaptchaSecret = 'YOUR_SECRET_KEY';
 
-       $response = file_get_contents(
-           "https://www.google.com/recaptcha/api/siteverify?secret=YOUR_SECRET_KEY&response={$recaptchaResponse}"
-       );
-       $result = json_decode($response, true);
+   $recaptchaVerifyUrl = 'https://www.google.com/recaptcha/api/siteverify';
+   $response = file_get_contents($recaptchaVerifyUrl . '?secret=' . $recaptchaSecret . '&response=' . $recaptchaResponse);
+   $responseData = json_decode($response);
 
-       if (empty($result['success']) || !$result['success']) {
-           Session::add('feedback_negative', 'reCAPTCHA-Überprüfung fehlgeschlagen.');
-           Redirect::to('register/index');
-           return;
-       }
-
-       // Benutzer registrieren, falls reCAPTCHA erfolgreich
-       RegistrationModel::registerNewUser();
-       Redirect::to('login/index');
+   if (!$responseData->success) {
+       Session::add('feedback_negative', 'Invalid reCAPTCHA. Please try again.');
+       Redirect::to('register/index');
+       exit();
    }
-   ```
-   Ersetze `YOUR_SECRET_KEY` durch den Google reCAPTCHA Secret Key.
 
-2. **Feedback anzeigen**:
-   Stelle sicher, dass Fehlermeldungen in der View `register/index.php` angezeigt werden:
-   ```php
-   if (Session::get('feedback_negative')) {
-       echo '<div class="error">' . Session::get('feedback_negative') . '</div>';
-   }
+   RegistrationModel::registerNewUser();
+   Redirect::to('login/index');
    ```
+   Ersetze `YOUR_SECRET_KEY` durch deinen Google Secret Key.
 
 ---
 
 ## Testen
-1. **Fehlende reCAPTCHA-Antwort:**
-   Übermittle das Formular ohne reCAPTCHA-Antwort und überprüfe, ob die Registrierung blockiert wird.
-
-2. **Ungültige reCAPTCHA-Antwort:**
-   Simuliere eine ungültige Antwort, um sicherzustellen, dass die Fehlermeldung korrekt angezeigt wird.
-
-3. **Gültige reCAPTCHA-Antwort:**
-   Teste das Formular mit einer gültigen Antwort und überprüfe, ob die Registrierung erfolgreich abgeschlossen wird.
+1. **Kein reCAPTCHA:** Überprüfe, ob das Formular blockiert wird, wenn kein reCAPTCHA vorhanden ist.
+2. **Falsches reCAPTCHA:** Teste, ob bei ungültigen Antworten eine Fehlermeldung angezeigt wird.
+3. **Gültiges reCAPTCHA:** Stelle sicher, dass eine erfolgreiche Registrierung möglich ist.
 
 ---
 
-## Fehlerbehebung
-- **Fehlermeldung: "localhost ist nicht in der Liste der unterstützten Domains":**
-  - Füge `localhost` in der Google reCAPTCHA Admin-Konsole zur Liste der erlaubten Domains hinzu.
-- **Kein Feedback angezeigt:**
-  - Überprüfe, ob `Session::add` und `Session::get` korrekt implementiert sind.
+## Genutzte Technologien
+
+![PHP](https://img.shields.io/badge/PHP-8.1%2B-blue) ![Huge Framework](https://img.shields.io/badge/Huge%20Framework-1.0-brightgreen) ![HTML5](https://img.shields.io/badge/HTML-5-orange) ![CSS3](https://img.shields.io/badge/CSS-3-blue) ![JavaScript](https://img.shields.io/badge/JavaScript-ES6%2B-yellow) ![PHPStorm](https://img.shields.io/badge/IDE-PHPStorm-purple) ![MySQL](https://img.shields.io/badge/Database-MySQL-lightblue) ![Apache](https://img.shields.io/badge/Server-Apache-lightgrey)
+
+⚠️ **Hinweis:** In diesem Repository wurde ausschließlich der `application`-Ordner hochgeladen. Dies geschieht, um den Datenschutz zu gewährleisten und keine sensiblen Daten wie Serverkonfigurationen oder Zugangsdaten öffentlich bereitzustellen. Dateien wie `config.php` und andere Konfigurationsdateien, die möglicherweise sensible Informationen enthalten, wurden absichtlich nicht hochgeladen.
 
 ---
 
 ## Ressourcen
-- [Google reCAPTCHA Dokumentation](https://developers.google.com/recaptcha/docs/display?hl=de)
+- [Google reCAPTCHA Admin-Konsole](https://www.google.com/recaptcha/admin)
+- [Google reCAPTCHA Dokumentation](https://developers.google.com/recaptcha/docs/v2)
 - [Huge Framework Dokumentation](https://huge-framework.readthedocs.io/)
 
 ---
 
-## Autor
-Dieses Projekt wurde als Teil des IT-Labors erstellt, um die Sicherheit der Benutzerregistrierung zu erhöhen.
+## Lizenz
+Dieses Projekt wurde im Rahmen eines IT-Labors erstellt und basiert auf dem Huge Framework.
