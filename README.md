@@ -11,8 +11,8 @@ Das Ziel ist es, sicherzustellen, dass nur echte Benutzer sich registrieren kön
 ---
 
 ## Anforderungen
-- **Google reCAPTCHA Konto:** Melde dich bei der [Google reCAPTCHA Admin-Konsole](https://www.google.com/recaptcha/admin) an.
-- **Site Key und Secret Key:** Diese erhältst du nach der Registrierung deiner Website.
+- **Google reCAPTCHA Konto:** Ein Google Konto und eine Anmeldung bei [Google reCAPTCHA Admin-Konsole](https://www.google.com/recaptcha/admin) ist nötig.
+- **Site Key und Secret Key:** Diese erhät man nach der Registrierung der eigenen Website.
 
 ---
 
