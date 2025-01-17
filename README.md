@@ -44,7 +44,9 @@ Das Ziel ist es, sicherzustellen, dass nur echte Benutzer sich registrieren kön
 
 ## Screenshots
 
-![APIjs]
+![APIjs](https://github.com/dino-2602/HUGE-Framework-Ue11/blob/main/huge/screenshots/APIjs.png)
+![g-recaptcha_data-sitekey](https://github.com/dino-2602/HUGE-Framework-Ue11/blob/main/huge/screenshots/g-recaptcha_data-sitekey.PNG)
+![g-recaptcha_response](https://github.com/dino-2602/HUGE-Framework-Ue11/blob/main/huge/screenshots/g-recaptcha_response.PNG)
 
 ### 2. Backend-Integration
 1. **Controller anpassen:**
