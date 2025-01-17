@@ -6,7 +6,7 @@ Dieses Projekt erweitert das Huge Framework, indem es Google reCAPTCHA V2 integr
 ---
 
 ## Ziel
-Das Ziel ist es, sicherzustellen, dass nur echte Benutzer sich registrieren können. Diese Funktionalität wurde speziell für den Admin-Bereich implementiert.
+Das Ziel ist es, sicherzustellen, dass nur echte Benutzer sich registrieren können. Diese Funktionalität wurde speziell für den Admin-Bereich, bei der registrierung neuer Nutzer implementiert und auch auf der Login Seite.
 
 ---
 
@@ -20,7 +20,7 @@ Das Ziel ist es, sicherzustellen, dass nur echte Benutzer sich registrieren kön
 
 ### 1. Frontend-Integration
 1. **Script einfügen:**
-   Binde das reCAPTCHA-Skript in der Datei `views/register/index.php` ein:
+   Einbinden des reCAPTCHA-Skript in der Datei `views/register/index.php`:
    ```html
    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
    ```
