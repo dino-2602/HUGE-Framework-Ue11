@@ -42,6 +42,10 @@ Das Ziel ist es, sicherzustellen, dass nur echte Benutzer sich registrieren kön
    </form>
    ```
 
+## Screenshots
+
+![APIjs]
+
 ### 2. Backend-Integration
 1. **Controller anpassen:**
    Bearbeite die Methode `register_action` in `controllers/RegisterController.php`:
